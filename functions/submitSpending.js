@@ -10,12 +10,13 @@ dotenv.config();
 // Set up middleware to parse incoming form data
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); // for JSON data as well
+const serviceAccountKey = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
 
 const sheet_id = process.env.SHEET_ID;  // Get sheet ID from .env
 app.use(express.static(path.join(__dirname, 'public')));
 // Google Sheets API authentication
 const auth = new google.auth.GoogleAuth({
-    keyFile: "key.json",  // Path to your service account key JSON file
+    keyFile: serviceAccountKey,  // Path to your service account key JSON file
     scopes: "https://www.googleapis.com/auth/spreadsheets"
 });
 
