@@ -10,7 +10,7 @@ dotenv.config();
 // Set up middleware to parse incoming form data
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); // for JSON data as well
-const serviceAccountKey = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
+const serviceAccountKey = JSON.parse(Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY, 'base64').toString('utf-8'));
 
 const sheet_id = process.env.SHEET_ID;  // Get sheet ID from .env
 app.use(express.static(path.join(__dirname, 'public')));
