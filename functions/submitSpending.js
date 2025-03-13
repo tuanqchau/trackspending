@@ -12,11 +12,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); // for JSON data as well
 //const serviceAccountKey = JSON.parse(Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY, 'base64').toString('utf-8'));
 
-const sheet_id = process.env.SHEET_ID;  // Get sheet ID from .env
+const sheet_id = Netlify.env.get(SHEET_ID);  // Get sheet ID from .env
 app.use(express.static(path.join(__dirname, 'public')));
 // Google Sheets API authentication
 const auth = new google.auth.GoogleAuth({
-    keyFile: process.env.GOOGLE_SERVICE_ACCOUNT_KEY,  
+    keyFile: Netlify.env.get(GOOGLE_SERVICE_ACCOUNT_KEY),  
     scopes: "https://www.googleapis.com/auth/spreadsheets"
 });
 
