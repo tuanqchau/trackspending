@@ -13,7 +13,7 @@ document.getElementById('spendingForm').addEventListener('submit', function(even
         price: price
     };
 
-    fetch('/.netlify/functions/submitSpending', {
+    fetch('https://tracking-spending.netlify.app/.netlify/functions/submitSpending', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
