@@ -1,30 +1,19 @@
 const { google } = require('googleapis');
 const dotenv = require('dotenv');
-const express = require('express');
-const path = require('path');
-
-const bodyParser = require('body-parser'); // Used to parse incoming form data
-const app = express();
+const { Handler } = require('@netlify/functions');
 dotenv.config();
 
-// Set up middleware to parse incoming form data
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json()); // for JSON data as well
-//const serviceAccountKey = JSON.parse(Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY, 'base64').toString('utf-8'));
-
-const sheet_id = process.env.SHEET_ID;  // Get sheet ID from .env
-app.use(express.static(path.join(__dirname, 'public')));
 // Google Sheets API authentication
 const auth = new google.auth.GoogleAuth({
     keyFile: process.env.GOOGLE_SERVICE_ACCOUNT_KEY,  
-    scopes: "https://www.googleapis.com/auth/spreadsheets"
+    scopes: 'https://www.googleapis.com/auth/spreadsheets',
 });
 
-// Route to handle form submission
-app.post('/submit-spending', async (req, res) => {
-    debugger
-    const { item, price } = req.body;
+const sheet_id = process.env.SHEET_ID;  // Get sheet ID from .env
 
+// The handler function that Netlify will call
+const submitSpending = async (event, context) => {
+    const { item, price } = JSON.parse(event.body || '{}');
     const description = item;
     const cost = parseFloat(price);
     const date = new Date().toLocaleDateString();
@@ -36,22 +25,28 @@ app.post('/submit-spending', async (req, res) => {
         // Append data to the Google Sheet
         await sheets.spreadsheets.values.append({
             spreadsheetId: sheet_id,
-            range: "Sheet1!A:B",  // You can change the range based on where you want to append
-            valueInputOption: "USER_ENTERED",
+            range: 'Sheet1!A:B',  // Change the range as needed
+            valueInputOption: 'USER_ENTERED',
             resource: {
                 values: [
-                    [description, cost, date] // Add description, price, and date
-                ]
-            }
+                    [description, cost, date], // Add description, price, and date
+                ],
+            },
         });
 
-        res.status(200).json({ message: 'Spending added successfully!' });
+        // Return success response
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: 'Spending added successfully!' }),
+        };
     } catch (error) {
         console.error('Error:', error);
-        res.status(500).json({ message: 'Failed to add spending.' });
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ message: 'Failed to add spending.' }),
+        };
     }
-});
-
-module.exports.handler = async function (event, context) {
-    return app(event, context);  // Call the Express app as a function
 };
+
+// Export the handler for Netlify to use
+module.exports.handler = submitSpending;
