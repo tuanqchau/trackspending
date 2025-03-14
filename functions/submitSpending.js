@@ -53,13 +53,5 @@ app.post('/submit-spending', async (req, res) => {
 });
 
 module.exports.handler = async function (event, context) {
-    const server = app;
-    return new Promise((resolve, reject) => {
-        server.listen(3000, () => {
-            resolve({
-                statusCode: 200,
-                body: 'Serverless function is running'
-            });
-        });
-    });
+    return app(event, context);  // Call the Express app as a function
 };
