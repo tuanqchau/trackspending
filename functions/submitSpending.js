@@ -45,15 +45,21 @@ app.post('/submit-spending', async (req, res) => {
             }
         });
 
-        res.send('Spending added successfully!');
+        res.status(200).json({ message: 'Spending added successfully!' });
     } catch (error) {
         console.error('Error:', error);
-        res.status(500).send('Failed to add spending.');
+        res.status(500).json({ message: 'Failed to add spending.' });
     }
 });
 
-// Start the Express server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+module.exports.handler = async function (event, context) {
+    const server = app;
+    return new Promise((resolve, reject) => {
+        server.listen(3000, () => {
+            resolve({
+                statusCode: 200,
+                body: 'Serverless function is running'
+            });
+        });
+    });
+};
